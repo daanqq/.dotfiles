@@ -59,7 +59,12 @@ dot-add() {
 
 dot-save() {
   local message="${1:-chore(dotfiles): sync}"
-  local staged staged_names
+  local source_dir staged staged_names
+  local auth_marker='_'
+  local token_prefix='sk'
+  local private_marker='PRIVATE'
+  local corporate_prefix='EUTP'
+  local session_prefix='PORA'
 
   (( $+commands[chezmoi] )) || {
     print -u2 'chezmoi is not installed'
@@ -67,27 +72,30 @@ dot-save() {
   }
 
   chezmoi re-add || return
-  chezmoi git -- add -A || return
+  source_dir=$(chezmoi source-path) || return
+  git -C "$source_dir" add -A || return
 
-  if chezmoi git -- diff --cached --quiet; then
+  if git -C "$source_dir" diff --cached --quiet; then
     print 'dotfiles: no changes'
     return 0
   fi
 
-  chezmoi git -- diff --cached --check || return
-  staged_names=$(chezmoi git -- diff --cached --name-only)
+  git -C "$source_dir" diff --cached --check || return
+  staged_names=$(git -C "$source_dir" diff --cached --name-only)
   if print -r -- "$staged_names" | grep -Eq '(^|/)private_dot_config/zsh/secrets\.zsh$'; then
     print -u2 'dotfiles: plaintext secrets.zsh detected; push aborted'
     return 1
   fi
 
-  staged=$(chezmoi git -- diff --cached --no-ext-diff)
-  if print -r -- "$staged" | grep -Eq '(_authToken=|BEGIN (OPENSSH |RSA |EC )?PRIVATE KEY|(^|[^[:alnum:]_])sk-[[:alnum:]_-]{20,})'; then
+  staged=$(git -C "$source_dir" diff --cached --no-ext-diff --unified=0 \
+    | grep '^+' \
+    | grep -v '^+++' || true)
+  if print -r -- "$staged" | grep -Eq "(${auth_marker}authToken=|BEGIN (OPENSSH |RSA |EC )?${private_marker} KEY|(^|[^[:alnum:]_])${token_prefix}-[[:alnum:]_-]{20,}|${corporate_prefix}_TOKEN=|${session_prefix}_SESSION=)"; then
     print -u2 'dotfiles: possible secret detected; push aborted'
     return 1
   fi
 
-  chezmoi git -- commit -m "$message" && chezmoi git -- push
+  git -C "$source_dir" commit -m "$message" && git -C "$source_dir" push
 }
 
 plugins=(git sudo)
