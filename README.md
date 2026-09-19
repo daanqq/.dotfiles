@@ -1,61 +1,42 @@
 # dotfiles
 
-Shared configuration for Ubuntu machines, managed with
+Shared Ubuntu configuration managed with
 [chezmoi](https://www.chezmoi.io/).
 
-Machine-specific work configuration is intentionally kept outside this
-repository in `~/.zshrc.local`. Shell secrets live in
-`~/.config/zsh/secrets.zsh` and must have mode `0600`.
+## Set up a new machine
 
-## Install
+Install the required tools:
+
+```bash
+sudo apt update
+sudo apt install -y age curl git zsh
+```
+
+Initialize and apply the dotfiles:
 
 ```bash
 sh -c "$(curl -fsLS https://get.chezmoi.io)" -- \
   init --apply https://github.com/daanqq/.dotfiles.git
 ```
 
-The shell configuration degrades gracefully when optional tools are missing.
-Install the tools you want to use separately, then make Zsh your login shell
-if needed:
+Enter the dotfiles passphrase when prompted. Chezmoi will restore the local
+age identity and decrypt the managed secrets.
+
+Make Zsh the login shell and start it:
 
 ```bash
 chsh -s "$(command -v zsh)"
+exec zsh
 ```
 
-## Daily use
-
-Add a new file once:
+Create the machine-specific Git identity:
 
 ```bash
-dot-add ~/.config/tool/config.toml
+mkdir -p ~/.config/git
+$EDITOR ~/.config/git/local.inc
 ```
 
-Copy changes from all managed files, commit, and push:
-
-```bash
-dot-save
-dot-save "chore(dotfiles): update shell aliases"
-```
-
-Inspect changes or update a machine:
-
-```bash
-chezmoi diff
-chezmoi update
-chezmoi managed
-```
-
-`dot-save` aborts on common private-key, npm-token, and API-key patterns. This
-is a safety net, not a substitute for reviewing `chezmoi diff` before pushing.
-
-## Local configuration
-
-Use `~/.zshrc.local` for work commands, internal hosts, per-machine paths, and
-tools that are not useful on every machine. It is sourced after the shared
-configuration and is not managed by chezmoi.
-
-Git identity and machine-specific Git settings belong in
-`~/.config/git/local.inc`, for example:
+For example:
 
 ```gitconfig
 [user]
@@ -63,42 +44,93 @@ Git identity and machine-specific Git settings belong in
     email = you@example.com
 ```
 
-## Secrets
+## Update managed files
 
-The local `~/.config/zsh/secrets.zsh` file is not managed as plaintext. To
-enable passphrase-protected secrets, run the one-time helper from the chezmoi
-source directory:
+Edit files in their normal locations under `$HOME`, then inspect and save the
+changes:
+
+```bash
+$EDITOR ~/.zshrc
+chezmoi diff
+dot-save "chore(zsh): update shell configuration"
+```
+
+Add a new file to chezmoi once, then save it:
+
+```bash
+dot-add ~/.config/tool/config.toml
+chezmoi diff
+dot-save "feat(tool): add tool configuration"
+```
+
+List all managed files:
+
+```bash
+chezmoi managed
+```
+
+Repository-only files such as `README.md` and `docs/` are edited directly in
+the source state:
 
 ```bash
 cd "$(chezmoi source-path)"
-./scripts/enable-passphrase-secrets.sh
+$EDITOR README.md
+dot-save "docs: update usage guide"
 ```
 
-The helper generates an age identity, asks for a passphrase, stores the
-passphrase-encrypted identity as `key.txt.age`, and adds the current secrets
-file with chezmoi encryption. The private identity is also installed locally
-at `~/.config/chezmoi/key.txt` with mode `0600`.
+## Update secrets
 
-Before pushing, save the passphrase and the original identity in a password
-manager or another secure backup. The passphrase is not recoverable from Git.
-
-After the helper finishes:
+Secrets belong in `~/.config/zsh/secrets.zsh`, not in `.zshrc`:
 
 ```bash
-dot-save "feat(secrets): enable passphrase bootstrap"
+$EDITOR ~/.config/zsh/secrets.zsh
+chmod 600 ~/.config/zsh/secrets.zsh
+source ~/.config/zsh/secrets.zsh
 ```
 
-The repository then contains only encrypted secret material. On a new Ubuntu
-machine, use two commands:
+Save the encrypted update:
 
 ```bash
-sudo apt install age
-sh -c "$(curl -fsLS https://get.chezmoi.io)" -- \
-  init --apply https://github.com/daanqq/.dotfiles.git
+dot-save "feat(secrets): update shell credentials"
 ```
 
-The second command asks for the passphrase once, restores the local age
-identity, and applies encrypted files. The identity file itself is ignored by
-chezmoi and is never copied into the home directory from Git.
+Verify that chezmoi still manages the encrypted source file:
 
-Do not add `~/.config/chezmoi/key.txt` to the repository.
+```bash
+chezmoi source-path ~/.config/zsh/secrets.zsh
+```
+
+The returned path must contain `encrypted_` and end with `.age`. Never add
+`~/.config/zsh/secrets.zsh` as plaintext.
+
+## Push updates
+
+`dot-save` copies changes from all managed files, checks the staged diff,
+creates a commit, and pushes it:
+
+```bash
+chezmoi diff
+dot-save "chore(dotfiles): describe the change"
+```
+
+Use a [Conventional Commit](https://www.conventionalcommits.org/) message.
+Without an argument, `dot-save` uses `chore(dotfiles): sync`.
+
+## Pull updates on another machine
+
+Preview and apply the latest remote state:
+
+```bash
+chezmoi git -- pull --ff-only
+chezmoi diff
+chezmoi apply
+```
+
+For the short path, use:
+
+```bash
+chezmoi update
+```
+
+See [`docs/architecture.md`](docs/architecture.md) for repository structure,
+local-only configuration, and the encryption design.

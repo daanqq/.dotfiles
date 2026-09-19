@@ -8,7 +8,7 @@ identity_file="$identity_dir/key.txt"
 encrypted_identity="$source_dir/key.txt.age"
 config_template="$source_dir/.chezmoi.toml.tmpl"
 ignore_file="$source_dir/.chezmoiignore"
-decrypt_script="$source_dir/run_onchange_before_decrypt-private-key.sh.tmpl"
+decrypt_script="$source_dir/.chezmoiscripts/run_onchange_before_decrypt-private-key.sh.tmpl"
 
 die() {
   printf 'error: %s\n' "$*" >&2
@@ -40,6 +40,7 @@ chezmoi age encrypt --passphrase --output "$tmp_encrypted_identity" "$tmp_identi
 
 install -m 600 "$tmp_identity" "$identity_file"
 install -m 600 "$tmp_encrypted_identity" "$encrypted_identity"
+mkdir -p "$(dirname "$decrypt_script")"
 
 if ! grep -qxF 'key.txt.age' "$ignore_file"; then
   printf 'key.txt.age\n' >> "$ignore_file"
