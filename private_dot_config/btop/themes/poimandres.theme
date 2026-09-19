@@ -1,0 +1,68 @@
+# btop theme: Poimandres
+# Matching Alacritty colors
+
+# Main background, empty for terminal default, can be hex with # at start
+theme[main_bg]="#1b1e28"
+
+# Main text color
+theme[main_fg]="#a6accd"
+
+# Title color for boxes
+theme[title]="#ffffff"
+
+# Highlight color for keyboard shortcuts
+theme[hi_fg]="#89ddff"
+
+# Background color of selected item in processes box
+theme[selected_bg]="#303340"
+
+# Foreground color of selected item in processes box
+theme[selected_fg]="#ffffff"
+
+# Color of inactive/disabled text
+theme[inactive_fg]="#50546d"
+
+# Color of graph points
+theme[graph_text]="#add7ff"
+
+# Misc colors for processes box including mini graphs
+theme[proc_misc]="#add7ff"
+
+# Cpu box outline color
+theme[cpu_box]="#89ddff"
+
+# Memory box outline color
+theme[mem_box]="#89ddff"
+
+# Net box outline color
+theme[net_box]="#89ddff"
+
+# Processes box outline color
+theme[proc_box]="#89ddff"
+
+# Box divider line and small font color
+theme[div_line]="#303340"
+
+# Temperature graph colors
+theme[temp_low]="#5de4c7"
+theme[temp_mid]="#fffac2"
+theme[temp_high]="#d0679d"
+
+# CPU graph colors
+theme[cpu_low]="#5de4c7"
+theme[cpu_mid]="#add7ff"
+theme[cpu_high]="#d0679d"
+
+# Mem adjoining resource graph colors
+theme[mem_low]="#5de4c7"
+theme[mem_mid]="#add7ff"
+theme[mem_high]="#fcc5e9"
+
+# Net graph colors
+theme[download_graph]="#5de4c7"
+theme[upload_graph]="#fcc5e9"
+
+# Process table gradient colors
+theme[proc_gradient_low]="#89ddff"
+theme[proc_gradient_mid]="#add7ff"
+theme[proc_gradient_high]="#5de4c7"

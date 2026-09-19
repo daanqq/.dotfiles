@@ -1,0 +1,153 @@
+// Place your key bindings in this file to override the defaultsauto[]
+[
+  {
+    "key": "ctrl+shift+alt+n",
+    "command": "editor.action.formatDocument.multiple"
+  },
+  {
+    "key": "ctrl+alt+x",
+    "command": "workbench.action.toggleAuxiliaryBar"
+  },
+  {
+    "key": "ctrl+alt+b",
+    "command": "-workbench.action.toggleAuxiliaryBar"
+  },
+  {
+    "key": "ctrl+alt+z",
+    "command": "workbench.action.toggleSidebarVisibility"
+  },
+  {
+    "key": "ctrl+b",
+    "command": "-workbench.action.toggleSidebarVisibility"
+  },
+  {
+    "key": "ctrl+q",
+    "command": "references-view.findReferences",
+    "when": "editorHasReferenceProvider"
+  },
+  {
+    "key": "shift+alt+f12",
+    "command": "-references-view.findReferences",
+    "when": "editorHasReferenceProvider"
+  },
+  {
+    "key": "ctrl+shift+l",
+    "command": "editor.action.insertSnippet",
+    "when": "editorTextFocus",
+    "args": {
+      "snippet": "console.log('${TM_SELECTED_TEXT}$1', ${TM_SELECTED_TEXT})$2"
+    }
+  },
+  {
+    "key": "ctrl+shift+k",
+    "command": "editor.action.insertSnippet",
+    "when": "editorTextFocus",
+    "args": {
+      "snippet": "console.log('${TM_SELECTED_TEXT}$1', JSON.stringify(${TM_SELECTED_TEXT}, null, 2))$2"
+    }
+  },
+  {
+    "key": "ctrl+q",
+    "command": "-workbench.action.quit"
+  },
+  {
+    "key": "ctrl+d",
+    "command": "-editor.action.addSelectionToNextFindMatch",
+    "when": "editorFocus"
+  },
+  {
+    "key": "ctrl+shift+alt+down",
+    "command": "-editor.action.copyLinesDownAction",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+k ctrl+u",
+    "command": "-editor.action.removeCommentLine",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+k ctrl+u",
+    "command": "workbench.action.files.revert"
+  },
+  {
+    "key": "ctrl+d",
+    "command": "runCommands",
+    "args": {
+      "commands": [
+        "cursorHome",          // перейти к первому непробельному символу
+        "cursorEndSelect" // начать выделение и дойти до конца строки
+      ]
+    }
+  },
+  {
+    "key": "ctrl+shift+d",
+    "command": "-workbench.view.debug",
+    "when": "viewContainer.workbench.view.debug.enabled"
+  },
+  // {
+  //   "key": "ctrl+shift+d",
+  //   "command": "editor.action.copyLinesDownAction"
+  // },
+  {
+    "key": "ctrl+shift+d",
+    "command": "macros.duplicateSelectionDown"
+  },
+  {
+    "key": "ctrl+alt+`",
+    "command": "workbench.action.createTerminalEditor"
+  },
+  {
+    "key": "ctrl+shift+g",
+    "command": "workbench.view.scm",
+    "when": "workbench.scm.active && !gitlens:disabled && config.gitlens.keymap == 'chorded'"
+  },
+  {
+    "key": "ctrl+shift+g g",
+    "command": "-workbench.view.scm",
+    "when": "workbench.scm.active && !gitlens:disabled && config.gitlens.keymap == 'chorded'"
+  },
+  {
+    "key": "ctrl+p",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+        "text": "\u0010"
+    },
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+shift+f",
+    "command": "-workbench.action.terminal.searchWorkspace",
+    "when": "terminalFocus && terminalProcessSupported && terminalTextSelected"
+  },
+  {
+    "key": "ctrl+shift+e",
+    "command": "workbench.view.explorer",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+shift+g",
+    "command": "workbench.view.scm",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+shift+x",
+    "command": "-workbench.view.extensions",
+    "when": "viewContainer.workbench.view.extensions.enabled"
+  },
+  {
+    "key": "ctrl+shift+x",
+    "command": "send-selection-to-terminal-extension.sendSelectionToTerminal",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+l",
+    "command": "-send-selection-to-terminal-extension.sendSelectionToTerminal",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+d",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": { "text": "\u0004" },
+    "when": "terminalFocus"
+  }
+]
