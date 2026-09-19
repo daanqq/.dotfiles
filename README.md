@@ -11,7 +11,7 @@ repository in `~/.zshrc.local`. Shell secrets live in
 
 ```bash
 sh -c "$(curl -fsLS https://get.chezmoi.io)" -- \
-  init --apply git@github.com:daanqq/.dotfiles.git
+  init --apply https://github.com/daanqq/.dotfiles.git
 ```
 
 The shell configuration degrades gracefully when optional tools are missing.
@@ -65,24 +65,40 @@ Git identity and machine-specific Git settings belong in
 
 ## Secrets
 
-The first-stage setup keeps secrets in the local
-`~/.config/zsh/secrets.zsh` file. Do not add that file as plaintext.
-
-To store it encrypted later, install `age`, create and back up an identity
-outside Git, configure chezmoi, and add the file with encryption:
-
-```toml
-# ~/.config/chezmoi/chezmoi.toml
-encryption = "age"
-
-[age]
-    identity = "~/.config/chezmoi/key.txt"
-    recipient = "age1..."
-```
+The local `~/.config/zsh/secrets.zsh` file is not managed as plaintext. To
+enable passphrase-protected secrets, run the one-time helper from the chezmoi
+source directory:
 
 ```bash
-chezmoi add --encrypt ~/.config/zsh/secrets.zsh
+cd "$(chezmoi source-path)"
+./scripts/enable-passphrase-secrets.sh
 ```
 
-Do not enable encryption until the private identity has a tested backup. The
-identity itself must never be committed to this repository.
+The helper generates an age identity, asks for a passphrase, stores the
+passphrase-encrypted identity as `key.txt.age`, and adds the current secrets
+file with chezmoi encryption. The private identity is also installed locally
+at `~/.config/chezmoi/key.txt` with mode `0600`.
+
+Before pushing, save the passphrase and the original identity in a password
+manager or another secure backup. The passphrase is not recoverable from Git.
+
+After the helper finishes:
+
+```bash
+dot-save "feat(secrets): enable passphrase bootstrap"
+```
+
+The repository then contains only encrypted secret material. On a new Ubuntu
+machine, use two commands:
+
+```bash
+sudo apt install age
+sh -c "$(curl -fsLS https://get.chezmoi.io)" -- \
+  init --apply https://github.com/daanqq/.dotfiles.git
+```
+
+The second command asks for the passphrase once, restores the local age
+identity, and applies encrypted files. The identity file itself is ignored by
+chezmoi and is never copied into the home directory from Git.
+
+Do not add `~/.config/chezmoi/key.txt` to the repository.

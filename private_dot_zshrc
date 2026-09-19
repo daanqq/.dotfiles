@@ -59,7 +59,7 @@ dot-add() {
 
 dot-save() {
   local message="${1:-chore(dotfiles): sync}"
-  local staged
+  local staged staged_names
 
   (( $+commands[chezmoi] )) || {
     print -u2 'chezmoi is not installed'
@@ -75,6 +75,12 @@ dot-save() {
   fi
 
   chezmoi git -- diff --cached --check || return
+  staged_names=$(chezmoi git -- diff --cached --name-only)
+  if print -r -- "$staged_names" | grep -Eq '(^|/)private_dot_config/zsh/secrets\.zsh$'; then
+    print -u2 'dotfiles: plaintext secrets.zsh detected; push aborted'
+    return 1
+  fi
+
   staged=$(chezmoi git -- diff --cached --no-ext-diff)
   if print -r -- "$staged" | grep -Eq '(_authToken=|BEGIN (OPENSSH |RSA |EC )?PRIVATE KEY|(^|[^[:alnum:]_])sk-[[:alnum:]_-]{20,})'; then
     print -u2 'dotfiles: possible secret detected; push aborted'
