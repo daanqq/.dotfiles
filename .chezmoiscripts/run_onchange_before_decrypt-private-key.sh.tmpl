@@ -3,10 +3,20 @@
 set -eu
 
 key="${HOME}/.config/chezmoi/key.txt"
+chezmoi_bin="$(command -v chezmoi 2>/dev/null || true)"
+
+if [ -z "$chezmoi_bin" ] && [ -x "${HOME}/.local/bin/chezmoi" ]; then
+    chezmoi_bin="${HOME}/.local/bin/chezmoi"
+fi
+
+if [ -z "$chezmoi_bin" ]; then
+    echo "chezmoi executable not found in PATH or ${HOME}/.local/bin" >&2
+    exit 127
+fi
 
 if [ ! -f "$key" ]; then
     mkdir -p "${HOME}/.config/chezmoi"
-    chezmoi age decrypt \
+    "$chezmoi_bin" age decrypt \
         --output "$key" \
         --passphrase \
         "{{ .chezmoi.sourceDir }}/key.txt.age"

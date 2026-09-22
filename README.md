@@ -16,7 +16,8 @@ Initialize and apply the dotfiles:
 
 ```bash
 sh -c "$(curl -fsLS https://get.chezmoi.io)" -- \
-  init --apply https://github.com/daanqq/.dotfiles.git
+  init https://github.com/daanqq/.dotfiles.git
+~/.local/bin/chezmoi apply
 ```
 
 Enter the dotfiles passphrase when prompted. Chezmoi will restore the local
